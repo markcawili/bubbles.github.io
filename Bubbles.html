@@ -1,0 +1,1236 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Bubbles</title>
+<style>
+  :root{
+    --bg:#DAD5CB;
+    --ink:#211F26;
+    --ink-dim:#6C6A72;
+    --line:rgba(33,31,38,.1);
+    --card:#FCFCFB;
+    --accent:#C9972B;
+    --prince:#4C6FE0;
+    --mark:#E39A4E;
+    --ayushi:#8B6FE0;
+    --adrian:#2FAE93;
+    color-scheme: light;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Manrope', system-ui, sans-serif;
+    position:relative;
+  }
+
+  /* ---------- background blobs ---------- */
+  .blob{ position:fixed; border-radius:50%; filter:blur(70px); pointer-events:none; z-index:0; }
+  .blob.b1{ width:520px; height:520px; left:-160px; top:-120px; background:#E39A88; opacity:.55; }
+  .blob.b2{ width:420px; height:420px; left:-60px; top:60px; background:#9C7FE0; opacity:.45; }
+  .blob.b3{ width:380px; height:380px; left:-220px; top:280px; background:#E7B3C9; opacity:.4; }
+  .blob.b4{ width:520px; height:520px; right:-180px; bottom:-140px; background:#E3A25C; opacity:.5; }
+  .blob.b5{ width:420px; height:420px; right:-80px; bottom:0px; background:#9C7FE0; opacity:.4; }
+  .blob.b6{ width:360px; height:360px; right:-200px; bottom:220px; background:#E7A6B8; opacity:.35; }
+
+  main, header, footer{ position:relative; z-index:1; }
+
+  .wrap{ max-width:1400px; margin:0 auto; padding:0 32px; }
+
+  /* ---------- header ---------- */
+  header.site{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px 32px;
+    max-width:1400px; margin:0 auto;
+  }
+
+  .brand{ display:flex; align-items:center; gap:10px; font-weight:800; font-size:15px; letter-spacing:-.01em; }
+  .brand-mark{ width:26px; height:26px; position:relative; flex:none; }
+  .brand-mark span{ position:absolute; width:13px; height:13px; border-radius:50%; }
+  .brand-mark span:nth-child(1){ background:var(--prince); left:0; top:0; }
+  .brand-mark span:nth-child(2){ background:var(--mark); right:0; top:0; }
+  .brand-mark span:nth-child(3){ background:var(--ayushi); left:0; bottom:0; }
+  .brand-mark span:nth-child(4){ background:var(--adrian); right:0; bottom:0; }
+
+  nav.site{ display:flex; gap:34px; }
+  nav.site a{
+    font-size:13px; font-weight:700; letter-spacing:.03em; text-transform:uppercase;
+    color:var(--ink); text-decoration:none; opacity:.75;
+    transition:opacity .15s ease;
+  }
+  nav.site a:hover{ opacity:1; }
+
+  .btn-pill{
+    background:var(--ink); color:#fff; border:none;
+    font-size:12.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+    padding:11px 20px; border-radius:999px; cursor:pointer;
+    transition:transform .12s ease, opacity .15s ease;
+  }
+  .btn-pill:hover{ opacity:.88; }
+  .btn-pill:active{ transform:scale(.96); }
+  .btn-pill:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+  @media (max-width:800px){ nav.site{ display:none; } }
+
+  /* ---------- hero ---------- */
+  .hero{
+    max-width:1400px; margin:0 auto; padding:26px 32px 70px;
+    display:grid; grid-template-columns:.8fr 1.2fr; gap:60px; align-items:center;
+  }
+  @media (max-width:980px){ .hero{ grid-template-columns:1fr; gap:40px; padding-bottom:40px; } }
+
+  .eyebrow{ font-size:12.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-dim); margin:0 0 14px; }
+  h1{
+    font-size:clamp(38px,4.6vw,58px); line-height:1.04; font-weight:800; letter-spacing:-.02em;
+    margin:0 0 20px; text-wrap:balance;
+  }
+  h1 u{ text-decoration:none; position:relative; }
+  h1 u::after{
+    content:''; position:absolute; left:0; right:0; bottom:.06em; height:.07em;
+    background:var(--ink); border-radius:2px;
+  }
+  .hero p.lead{ font-size:16px; line-height:1.6; color:var(--ink-dim); max-width:42ch; margin:0 0 28px; font-weight:500; }
+  .hero-actions{ display:flex; align-items:center; gap:26px; flex-wrap:wrap; }
+  .see-arrow{ display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-dim); }
+  .see-arrow svg{ width:44px; height:26px; color:var(--ink-dim); }
+  @media (max-width:980px){ .see-arrow{ display:none; } }
+
+  /* ---------- panel ---------- */
+  .panel{
+    background:var(--card); border:1px solid var(--line); border-radius:20px;
+    box-shadow:0 20px 46px rgba(33,31,38,.14);
+    overflow:hidden;
+  }
+  .panel-canvas{ position:relative; height:560px; overflow:hidden; }
+  @media (max-width:980px){ .panel-canvas{ height:400px; } }
+  @media (max-width:520px){ .panel-canvas{ height:360px; } }
+
+  .panel-info{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:13px 18px; border-top:1px solid var(--line);
+    font-size:12.5px; color:var(--ink-dim); font-weight:600;
+  }
+  .panel-info .left{ display:flex; align-items:center; gap:8px; color:var(--ink); }
+  .panel-info .dotcluster{ width:14px; height:14px; position:relative; flex:none; }
+  .panel-info .dotcluster span{ position:absolute; width:7px; height:7px; border-radius:50%; }
+  .panel-info .dotcluster span:nth-child(1){ background:var(--prince); left:0; top:0; }
+  .panel-info .dotcluster span:nth-child(2){ background:var(--mark); right:0; top:0; }
+  .panel-info .dotcluster span:nth-child(3){ background:var(--ayushi); left:0; bottom:0; }
+  .panel-info .dotcluster span:nth-child(4){ background:var(--adrian); right:0; bottom:0; }
+
+  /* ---------- legend row ---------- */
+  .legend-row{ max-width:1180px; margin:0 auto; padding:10px 32px 76px; display:grid; grid-template-columns:repeat(4,1fr); gap:36px; }
+  @media (max-width:900px){ .legend-row{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:520px){ .legend-row{ grid-template-columns:1fr; padding-bottom:56px; } }
+  .legend-item .badge{ width:34px; height:34px; border-radius:50%; border:1.6px solid var(--ink); display:flex; align-items:center; justify-content:center; margin-bottom:16px; }
+  .legend-item .badge svg{ width:15px; height:15px; }
+  .legend-item h3{ font-size:17px; font-weight:800; margin:0 0 8px; letter-spacing:-.01em; }
+  .legend-item p{ font-size:14px; line-height:1.55; color:var(--ink-dim); margin:0; font-weight:500; }
+
+  /* ---------- team strip ---------- */
+  #team{ max-width:1180px; margin:0 auto; padding:0 32px 84px; }
+  .team-head{ font-size:12.5px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-dim); margin:0 0 22px; }
+  .team-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:18px; }
+  @media (max-width:900px){ .team-grid{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:520px){ .team-grid{ grid-template-columns:1fr; } }
+  .team-card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; display:flex; gap:12px; align-items:flex-start; }
+  .team-swatch{ width:38px; height:38px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; }
+  .team-swatch .icon-emoji{ line-height:1; }
+  .team-card h4{ margin:0 0 4px; font-size:15px; font-weight:800; }
+  .team-card p{ margin:0; font-size:12.5px; color:var(--ink-dim); line-height:1.5; font-weight:600; }
+
+  /* ---------- footer ---------- */
+  footer.site{ background:var(--ink); color:#fff; padding:34px 32px; text-align:center; }
+  footer.site .f1{ font-size:13px; font-weight:700; letter-spacing:.03em; }
+  footer.site .f2{ font-size:12px; color:rgba(255,255,255,.5); margin-top:6px; font-weight:600; }
+
+  /* ================= BUBBLE CANVAS ================= */
+  .bubble{ position:absolute; top:0; left:0; touch-action:none; cursor:grab; z-index:2; outline:none; }
+  .bubble.dragging{ cursor:grabbing; z-index:8; }
+
+  .bubble-inner{
+    width:100%; height:100%; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(160deg, color-mix(in srgb, var(--accent-c) 82%, white 14%), var(--accent-c));
+    box-shadow:0 8px 18px color-mix(in srgb, var(--accent-c) 30%, transparent);
+    transition:transform .16s cubic-bezier(.3,.7,.4,1), box-shadow .18s ease, opacity .16s ease;
+  }
+  .bubble:focus-visible .bubble-inner{ outline:3px solid var(--accent); outline-offset:3px; }
+  .bubble-inner.hovered{ transform:scale(1.08); box-shadow:0 10px 24px color-mix(in srgb, var(--accent-c) 40%, transparent); }
+  .bubble.dragging .bubble-inner{ transform:scale(1.12); box-shadow:0 14px 30px color-mix(in srgb, var(--accent-c) 45%, transparent); }
+  .bubble-inner.compress{ transform:scale(.72); opacity:.6; }
+  .bubble-inner.target-glow{ transform:scale(1.07); box-shadow:0 0 0 4px color-mix(in srgb, var(--accent) 55%, transparent), 0 10px 22px color-mix(in srgb, var(--accent-c) 40%, transparent); }
+  .bubble-inner.spawn-in{ transform:scale(.4); opacity:0; }
+  .bubble-inner.reject{ animation:shake .32s ease; }
+  @keyframes shake{ 0%,100%{transform:translateX(0) scale(1);} 25%{transform:translateX(-4px) scale(1);} 75%{transform:translateX(4px) scale(1);} }
+  .bubble-inner .icon-emoji{ line-height:1; filter:drop-shadow(0 1px 2px rgba(0,0,0,.18)); pointer-events:none; }
+
+  .dots{ position:absolute; display:flex; gap:5px; pointer-events:none; transform:translate(-50%,0); z-index:3; }
+  .dots span{ width:5px; height:5px; border-radius:50%; background:rgba(33,31,38,.18); }
+  .dots span.active{ background:var(--ink-dim); }
+  .name-tag{ position:absolute; pointer-events:none; transform:translate(-50%,0); z-index:3; font-weight:700; font-size:11.5px; color:var(--ink); opacity:.6; text-align:center; white-space:nowrap; }
+
+  .tooltip{
+    position:fixed; z-index:20; pointer-events:none; transform:translate(-50%,-100%);
+    padding:10px 14px; border-radius:10px; background:var(--card); border:1px solid var(--line);
+    box-shadow:0 12px 26px rgba(33,31,38,.16); max-width:min(72vw,280px); opacity:0; transition:opacity .12s ease;
+  }
+  .tooltip.show{ opacity:1; }
+  .tooltip .tt-name{ font-weight:700; font-size:14px; margin-bottom:2px; }
+  .tooltip .tt-sub{ font-size:12px; color:var(--ink-dim); line-height:1.4; font-weight:500; }
+
+  /* ---------- shared-traits reveal (inline, on-page) ---------- */
+  .connects-wrap{ max-width:1180px; margin:0 auto; padding:0 32px 46px; display:flex; justify-content:center; }
+  .connects-card{
+    width:100%; max-width:680px; background:var(--card); border:1px solid var(--line); border-radius:18px;
+    padding:28px 30px; box-shadow:0 16px 38px rgba(33,31,38,.1);
+    transition:opacity .2s ease;
+  }
+  .match-stat{ display:flex; align-items:center; gap:16px; margin:18px 0 4px; padding:14px 16px; background:color-mix(in srgb, var(--accent) 10%, transparent); border-radius:14px; }
+  .match-stat .stat-num{ font-size:34px; font-weight:800; color:var(--accent); letter-spacing:-.02em; line-height:1; flex:none; }
+  .match-stat .stat-copy p{ margin:0; }
+  .match-stat .stat-label{ font-size:13px; font-weight:800; }
+  .match-stat .stat-sub{ font-size:12px; color:var(--ink-dim); font-weight:600; margin-top:2px !important; }
+  .domain-heading{ font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); margin:18px 0 8px; }
+  .domain-heading:first-of-type{ margin-top:8px; }
+  .facet-row.compact{ margin-bottom:10px; }
+  .facet-row.compact .flabel{ font-size:12.5px; margin-bottom:5px; }
+  .reveal-head{ display:flex; align-items:center; gap:14px; margin-bottom:4px; }
+  .reveal-icon{ width:44px; height:44px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; flex:none; }
+  .reveal-icon .icon-emoji{ line-height:1; }
+  .reveal-head h3{ margin:0 0 3px; font-size:18px; font-weight:800; letter-spacing:-.01em; }
+  .reveal-head p{ margin:0; font-size:12.5px; color:var(--accent); font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+
+  .reveal-legend{ display:flex; gap:16px; margin:20px 0 4px; }
+  .reveal-legend .chip{ display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; }
+  .reveal-legend .chip i{ width:9px; height:9px; border-radius:50%; display:inline-block; }
+
+  .facet-scale{ display:flex; justify-content:space-between; font-size:10.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-dim); opacity:.6; margin:14px 0 6px; }
+  .facet-row{ margin-bottom:16px; }
+  .facet-row .flabel{ font-size:13px; font-weight:700; margin-bottom:7px; display:flex; align-items:center; gap:6px; }
+  .facet-row .match{ font-size:10.5px; font-weight:800; color:var(--accent); background:color-mix(in srgb, var(--accent) 16%, transparent); padding:2px 7px; border-radius:999px; }
+  .ftrack{ position:relative; height:8px; background:#EDE9E1; border-radius:999px; }
+  .ftrack::before, .ftrack::after{ content:''; position:absolute; top:0; bottom:0; width:1px; background:rgba(33,31,38,.14); }
+  .ftrack::before{ left:33.3%; }
+  .ftrack::after{ left:66.6%; }
+  .fmark{ position:absolute; width:13px; height:13px; border-radius:50%; border:2.5px solid var(--card); box-shadow:0 1px 3px rgba(0,0,0,.25); top:50%; transform:translate(-50%,-50%); }
+
+  .empty-state{ text-align:center; padding:20px 6px 6px; }
+  .empty-state svg{ width:36px; height:36px; color:var(--ink-dim); opacity:.5; margin-bottom:12px; }
+  .empty-state p{ font-size:13.5px; color:var(--ink-dim); line-height:1.55; font-weight:600; margin:0; }
+
+  @media (prefers-reduced-motion: reduce){ .bubble-inner, .connects-card{ transition-duration:.01ms !important; animation-duration:.01ms !important; } }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+
+<div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+<div class="blob b4"></div><div class="blob b5"></div><div class="blob b6"></div>
+
+<header class="site">
+  <div class="brand"><span class="brand-mark"><span></span><span></span><span></span><span></span></span>A Family of Buttons</div>
+  <nav class="site">
+    <a href="#legend">How it works</a>
+    <a href="#team">The team</a>
+  </nav>
+  <button class="btn-pill" id="reset-header">Reset bubbles</button>
+</header>
+
+<main>
+  <section class="hero">
+    <div>
+      <p class="eyebrow">CPSC 581 &middot; Group Project 1</p>
+      <h1>Four people.<br>One <u>connected</u> team.</h1>
+      <p class="lead">Every bubble is a teammate, distilled into an icon and a few real interests. Hover to meet them, then drag two together to see what actually connects them.</p>
+      <div class="hero-actions">
+        <button class="btn-pill" id="reset-hero">Meet the team</button>
+        <span class="see-arrow">Drag to connect
+          <svg viewBox="0 0 44 26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 4c10 0 8 16 18 17"/><path d="M14 18l6 3.5-1-6.8"/></svg>
+        </span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-canvas" id="stage">
+        <div id="tooltip" class="tooltip"><div class="tt-name"></div><div class="tt-sub"></div></div>
+      </div>
+      <div class="panel-info">
+        <div class="left"><span class="dotcluster"><span></span><span></span><span></span><span></span></span>A Family of Buttons &middot; Live canvas</div>
+        <div class="right">CPSC 581 &middot; Fall 2026</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="connects-wrap">
+    <div class="connects-card" id="connects"></div>
+  </section>
+
+  <section class="legend-row" id="legend">
+    <div class="legend-item">
+      <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7.5-4.6-10-9.3C.6 8.4 2.4 5 6 5c2.2 0 3.6 1.2 6 3.4C14.4 6.2 15.8 5 18 5c3.6 0 5.4 3.4 4 6.7C19.5 16.4 12 21 12 21z"/></svg></div>
+      <h3>Hover</h3>
+      <p>Rest your cursor on a bubble to see who it is and what they're into right now.</p>
+    </div>
+    <div class="legend-item">
+      <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg></div>
+      <h3>Click</h3>
+      <p>Cycle through each person's real interests, one tap at a time.</p>
+    </div>
+    <div class="legend-item">
+      <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+      <h3>Drag</h3>
+      <p>Pull one bubble into another. A glowing ring means a real connection is waiting.</p>
+    </div>
+    <div class="legend-item">
+      <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v6M12 15v6M3 12h6M15 12h6"/></svg></div>
+      <h3>Discover</h3>
+      <p>The card below the canvas updates the moment two bubbles merge, with the full trait comparison.</p>
+    </div>
+  </section>
+
+  <section id="team">
+    <p class="team-head">The Team</p>
+    <div class="team-grid" id="team-grid"></div>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="f1">CPSC 581 &middot; Group Project 1 &middot; A Family of Buttons</div>
+  <div class="f2">Prince &middot; Mark &middot; Ayushi &middot; Adrian</div>
+</footer>
+
+
+<script>
+(function(){
+  "use strict";
+
+  var ICONS = {
+    car: '🏎️',
+    cycle: '🚴',
+    moon: '🌙',
+    book: '📚',
+    movie: '🎬',
+    volleyball: '🏐',
+    tech: '💻',
+    swim: '🏊',
+    climb: '🧗',
+    games: '🎮',
+    music: '🎵',
+    cooking: '🍳',
+    dance: '💃',
+    travel: '✈️',
+    streaming: '📺',
+    handshake: '🤝',
+    puzzle: '🧩'
+  };
+  function iconMarkup(name, px){
+    var size = px || 24;
+    return '<span class="icon-emoji" style="font-size:'+size+'px">'+(ICONS[name]||'')+'</span>';
+  }
+
+  var audioContext = null;
+  function playBubbleSound(type){
+    var AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+    if (!audioContext) audioContext = new AudioContextClass();
+    if (audioContext.state === 'suspended') audioContext.resume();
+
+    var now = audioContext.currentTime;
+    var oscillator = audioContext.createOscillator();
+    var gain = audioContext.createGain();
+    var isUnmerge = type === 'unmerge';
+
+    oscillator.type = isUnmerge ? 'sine' : 'triangle';
+    oscillator.frequency.setValueAtTime(isUnmerge ? 520 : 360, now);
+    oscillator.frequency.exponentialRampToValueAtTime(isUnmerge ? 220 : 620, now + 0.14);
+
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.08, now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+    oscillator.start(now);
+    oscillator.stop(now + 0.17);
+  }
+
+  // ---------------------------------------------------------------
+  // TEAM DATA — add a teammate by adding a MEMBERS entry, then add a
+  // COMBOS entry for any pairing/group that shares a real interest.
+  // `facets` on a combo is optional — only add it once both people's
+  // Big Five reports confirm the same qualitative band.
+  // ---------------------------------------------------------------
+  var MEMBERS = {
+    prince: { id:'prince', name:'Prince', color:'var(--prince)', identityIcon:'car',
+      interests:[ {icon:'car',label:'Cars'}, {icon:'movie',label:'Movies'}, {icon:'volleyball',label:'Volleyball'}, {icon:'tech',label:'Tech'} ] },
+    mark: { id:'mark', name:'Mark', color:'var(--mark)', identityIcon:'cycle',
+      interests:[ {icon:'volleyball',label:'Volleyball'}, {icon:'swim',label:'Swimming'}, {icon:'cycle',label:'Cycling'}, {icon:'climb',label:'Climbing'}, {icon:'games',label:'Games'} ] },
+    ayushi: { id:'ayushi', name:'Ayushi', color:'var(--ayushi)', identityIcon:'moon',
+      interests:[ {icon:'movie',label:'Movies'}, {icon:'music',label:'Music'}, {icon:'cooking',label:'Cooking'}, {icon:'dance',label:'Dance'}, {icon:'travel',label:'Travelling'} ] },
+    adrian: { id:'adrian', name:'Adrian', color:'var(--adrian)', identityIcon:'book',
+      interests:[ {icon:'book',label:'Books'}, {icon:'streaming',label:'Streaming'}, {icon:'games',label:'Video Games'}, {icon:'cooking',label:'Cooking & Food'}, {icon:'music',label:'Music'} ] }
+  };
+
+  var COMBOS = {
+    'mark,prince': { icon:'volleyball', label:'Volleyball', names:['Mark','Prince'],
+      trait:'22 of 30 traits land in the same band — both stay calm under pressure, follow through on commitments, and rarely overthink. The real split is energy and ideology: Mark runs hotter socially (Friendliness, Activity Level and Cheerfulness all High), while Prince leans further into Liberalism and takes the lead more directly (Assertiveness: High vs Moderate).',
+      facets:[
+        {domain:'Extraversion', label:'Friendliness', levels:{mark:'high', prince:'moderate'}},
+        {domain:'Extraversion', label:'Gregariousness', levels:{mark:'moderate', prince:'low'}},
+        {domain:'Extraversion', label:'Assertiveness', levels:{mark:'moderate', prince:'high'}},
+        {domain:'Extraversion', label:'Activity Level', levels:{mark:'high', prince:'moderate'}},
+        {domain:'Extraversion', label:'Excitement-Seeking', levels:{mark:'moderate', prince:'moderate'}},
+        {domain:'Extraversion', label:'Cheerfulness', levels:{mark:'high', prince:'moderate'}},
+        {domain:'Emotionality', label:'Anxiety', levels:{mark:'low', prince:'low'}},
+        {domain:'Emotionality', label:'Frustration', levels:{mark:'low', prince:'low'}},
+        {domain:'Emotionality', label:'Melancholy', levels:{mark:'low', prince:'low'}},
+        {domain:'Emotionality', label:'Self-Consciousness', levels:{mark:'moderate', prince:'moderate'}},
+        {domain:'Emotionality', label:'Immoderation', levels:{mark:'moderate', prince:'moderate'}},
+        {domain:'Emotionality', label:'Vulnerability', levels:{mark:'low', prince:'low'}},
+        {domain:'Conscientiousness', label:'Self-Efficacy', levels:{mark:'high', prince:'moderate'}},
+        {domain:'Conscientiousness', label:'Orderliness', levels:{mark:'high', prince:'high'}},
+        {domain:'Conscientiousness', label:'Dependability', levels:{mark:'moderate', prince:'moderate'}},
+        {domain:'Conscientiousness', label:'Achievement-Striving', levels:{mark:'moderate', prince:'moderate'}},
+        {domain:'Conscientiousness', label:'Self-Discipline', levels:{mark:'high', prince:'high'}},
+        {domain:'Conscientiousness', label:'Cautiousness', levels:{mark:'high', prince:'high'}},
+        {domain:'Agreeableness', label:'Trust', levels:{mark:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Morality', levels:{mark:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Altruism', levels:{mark:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Cooperation', levels:{mark:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Modesty', levels:{mark:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Sympathy', levels:{mark:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Imagination', levels:{mark:'moderate', prince:'low'}},
+        {domain:'Openness', label:'Artistic Interests', levels:{mark:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Sentimentality', levels:{mark:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Adventurousness', levels:{mark:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Intellect', levels:{mark:'low', prince:'low'}},
+        {domain:'Openness', label:'Liberalism', levels:{mark:'moderate', prince:'high'}}
+      ] },
+    'ayushi,mark': { icon:'handshake', label:'Personality Match', names:['Ayushi','Mark'],
+      trait:'16 of 30 traits land in the same band. Both align across several steady, cooperative, and open-to-change facets, while their clearest differences are in social energy, emotional reactivity, and a few structure-related facets.',
+      facets:[
+        {domain:'Extraversion', label:'Friendliness', levels:{ayushi:'moderate', mark:'high'}},
+        {domain:'Extraversion', label:'Gregariousness', levels:{ayushi:'high', mark:'moderate'}},
+        {domain:'Extraversion', label:'Assertiveness', levels:{ayushi:'moderate', mark:'moderate'}},
+        {domain:'Extraversion', label:'Activity Level', levels:{ayushi:'moderate', mark:'high'}},
+        {domain:'Extraversion', label:'Excitement-Seeking', levels:{ayushi:'moderate', mark:'moderate'}},
+        {domain:'Extraversion', label:'Cheerfulness', levels:{ayushi:'moderate', mark:'high'}},
+        {domain:'Emotionality', label:'Anxiety', levels:{ayushi:'moderate', mark:'low'}},
+        {domain:'Emotionality', label:'Frustration', levels:{ayushi:'moderate', mark:'low'}},
+        {domain:'Emotionality', label:'Melancholy', levels:{ayushi:'moderate', mark:'low'}},
+        {domain:'Emotionality', label:'Self-Consciousness', levels:{ayushi:'moderate', mark:'moderate'}},
+        {domain:'Emotionality', label:'Immoderation', levels:{ayushi:'moderate', mark:'moderate'}},
+        {domain:'Emotionality', label:'Vulnerability', levels:{ayushi:'moderate', mark:'low'}},
+        {domain:'Conscientiousness', label:'Self-Efficacy', levels:{ayushi:'moderate', mark:'high'}},
+        {domain:'Conscientiousness', label:'Orderliness', levels:{ayushi:'high', mark:'high'}},
+        {domain:'Conscientiousness', label:'Dependability', levels:{ayushi:'moderate', mark:'moderate'}},
+        {domain:'Conscientiousness', label:'Achievement-Striving', levels:{ayushi:'moderate', mark:'moderate'}},
+        {domain:'Conscientiousness', label:'Self-Discipline', levels:{ayushi:'moderate', mark:'high'}},
+        {domain:'Conscientiousness', label:'Cautiousness', levels:{ayushi:'moderate', mark:'high'}},
+        {domain:'Agreeableness', label:'Trust', levels:{ayushi:'moderate', mark:'moderate'}},
+        {domain:'Agreeableness', label:'Morality', levels:{ayushi:'moderate', mark:'moderate'}},
+        {domain:'Agreeableness', label:'Altruism', levels:{ayushi:'moderate', mark:'moderate'}},
+        {domain:'Agreeableness', label:'Cooperation', levels:{ayushi:'moderate', mark:'moderate'}},
+        {domain:'Agreeableness', label:'Modesty', levels:{ayushi:'high', mark:'moderate'}},
+        {domain:'Agreeableness', label:'Sympathy', levels:{ayushi:'moderate', mark:'moderate'}},
+        {domain:'Openness', label:'Imagination', levels:{ayushi:'low', mark:'moderate'}},
+        {domain:'Openness', label:'Artistic Interests', levels:{ayushi:'moderate', mark:'moderate'}},
+        {domain:'Openness', label:'Sentimentality', levels:{ayushi:'moderate', mark:'moderate'}},
+        {domain:'Openness', label:'Adventurousness', levels:{ayushi:'moderate', mark:'moderate'}},
+        {domain:'Openness', label:'Intellect', levels:{ayushi:'moderate', mark:'low'}},
+        {domain:'Openness', label:'Liberalism', levels:{ayushi:'moderate', mark:'moderate'}}
+      ] },
+        'adrian,ayushi,mark': { icon:'puzzle', label:'Team Match', names:['Adrian', 'Ayushi', 'Mark'],
+      trait:'11 of 30 facets land in the same Low/Moderate/High band across Adrian, Ayushi and Mark. This team match is calculated directly from their ITP facet bands.',
+      facets:[
+        {domain:'Extraversion', label:'Friendliness', levels:{adrian:'moderate', ayushi:'moderate', mark:'high'}},
+        {domain:'Extraversion', label:'Gregariousness', levels:{adrian:'low', ayushi:'high', mark:'moderate'}},
+        {domain:'Extraversion', label:'Assertiveness', levels:{adrian:'moderate', ayushi:'moderate', mark:'moderate'}},
+        {domain:'Extraversion', label:'Activity Level', levels:{adrian:'moderate', ayushi:'moderate', mark:'high'}},
+        {domain:'Extraversion', label:'Excitement-Seeking', levels:{adrian:'moderate', ayushi:'moderate', mark:'moderate'}},
+        {domain:'Extraversion', label:'Cheerfulness', levels:{adrian:'moderate', ayushi:'moderate', mark:'high'}},
+        {domain:'Emotionality', label:'Anxiety', levels:{adrian:'high', ayushi:'moderate', mark:'low'}},
+        {domain:'Emotionality', label:'Frustration', levels:{adrian:'moderate', ayushi:'moderate', mark:'low'}},
+        {domain:'Emotionality', label:'Melancholy', levels:{adrian:'high', ayushi:'moderate', mark:'low'}},
+        {domain:'Emotionality', label:'Self-Consciousness', levels:{adrian:'moderate', ayushi:'moderate', mark:'moderate'}},
+        {domain:'Emotionality', label:'Immoderation', levels:{adrian:'moderate', ayushi:'moderate', mark:'moderate'}},
+        {domain:'Emotionality', label:'Vulnerability', levels:{adrian:'moderate', ayushi:'moderate', mark:'low'}},
+        {domain:'Conscientiousness', label:'Self-Efficacy', levels:{adrian:'moderate', ayushi:'moderate', mark:'high'}},
+        {domain:'Conscientiousness', label:'Orderliness', levels:{adrian:'low', ayushi:'high', mark:'high'}},
+        {domain:'Conscientiousness', label:'Dependability', levels:{adrian:'low', ayushi:'moderate', mark:'moderate'}},
+        {domain:'Conscientiousness', label:'Achievement-Striving', levels:{adrian:'moderate', ayushi:'moderate', mark:'moderate'}},
+        {domain:'Conscientiousness', label:'Self-Discipline', levels:{adrian:'low', ayushi:'moderate', mark:'high'}},
+        {domain:'Conscientiousness', label:'Cautiousness', levels:{adrian:'moderate', ayushi:'moderate', mark:'high'}},
+        {domain:'Agreeableness', label:'Trust', levels:{adrian:'moderate', ayushi:'moderate', mark:'moderate'}},
+        {domain:'Agreeableness', label:'Morality', levels:{adrian:'moderate', ayushi:'moderate', mark:'moderate'}},
+        {domain:'Agreeableness', label:'Altruism', levels:{adrian:'moderate', ayushi:'moderate', mark:'moderate'}},
+        {domain:'Agreeableness', label:'Cooperation', levels:{adrian:'low', ayushi:'moderate', mark:'moderate'}},
+        {domain:'Agreeableness', label:'Modesty', levels:{adrian:'moderate', ayushi:'high', mark:'moderate'}},
+        {domain:'Agreeableness', label:'Sympathy', levels:{adrian:'moderate', ayushi:'moderate', mark:'moderate'}},
+        {domain:'Openness', label:'Imagination', levels:{adrian:'high', ayushi:'low', mark:'moderate'}},
+        {domain:'Openness', label:'Artistic Interests', levels:{adrian:'moderate', ayushi:'moderate', mark:'moderate'}},
+        {domain:'Openness', label:'Sentimentality', levels:{adrian:'moderate', ayushi:'moderate', mark:'moderate'}},
+        {domain:'Openness', label:'Adventurousness', levels:{adrian:'low', ayushi:'moderate', mark:'moderate'}},
+        {domain:'Openness', label:'Intellect', levels:{adrian:'moderate', ayushi:'moderate', mark:'low'}},
+        {domain:'Openness', label:'Liberalism', levels:{adrian:'high', ayushi:'moderate', mark:'moderate'}}
+      ] },
+    'adrian,ayushi,prince': { icon:'puzzle', label:'Team Match', names:['Adrian', 'Ayushi', 'Prince'],
+      trait:'14 of 30 facets land in the same Low/Moderate/High band across Adrian, Ayushi and Prince. This team match is calculated directly from their ITP facet bands.',
+      facets:[
+        {domain:'Extraversion', label:'Friendliness', levels:{adrian:'moderate', ayushi:'moderate', prince:'moderate'}},
+        {domain:'Extraversion', label:'Gregariousness', levels:{adrian:'low', ayushi:'high', prince:'low'}},
+        {domain:'Extraversion', label:'Assertiveness', levels:{adrian:'moderate', ayushi:'moderate', prince:'high'}},
+        {domain:'Extraversion', label:'Activity Level', levels:{adrian:'moderate', ayushi:'moderate', prince:'moderate'}},
+        {domain:'Extraversion', label:'Excitement-Seeking', levels:{adrian:'moderate', ayushi:'moderate', prince:'moderate'}},
+        {domain:'Extraversion', label:'Cheerfulness', levels:{adrian:'moderate', ayushi:'moderate', prince:'moderate'}},
+        {domain:'Emotionality', label:'Anxiety', levels:{adrian:'high', ayushi:'moderate', prince:'low'}},
+        {domain:'Emotionality', label:'Frustration', levels:{adrian:'moderate', ayushi:'moderate', prince:'low'}},
+        {domain:'Emotionality', label:'Melancholy', levels:{adrian:'high', ayushi:'moderate', prince:'low'}},
+        {domain:'Emotionality', label:'Self-Consciousness', levels:{adrian:'moderate', ayushi:'moderate', prince:'moderate'}},
+        {domain:'Emotionality', label:'Immoderation', levels:{adrian:'moderate', ayushi:'moderate', prince:'moderate'}},
+        {domain:'Emotionality', label:'Vulnerability', levels:{adrian:'moderate', ayushi:'moderate', prince:'low'}},
+        {domain:'Conscientiousness', label:'Self-Efficacy', levels:{adrian:'moderate', ayushi:'moderate', prince:'moderate'}},
+        {domain:'Conscientiousness', label:'Orderliness', levels:{adrian:'low', ayushi:'high', prince:'high'}},
+        {domain:'Conscientiousness', label:'Dependability', levels:{adrian:'low', ayushi:'moderate', prince:'moderate'}},
+        {domain:'Conscientiousness', label:'Achievement-Striving', levels:{adrian:'moderate', ayushi:'moderate', prince:'moderate'}},
+        {domain:'Conscientiousness', label:'Self-Discipline', levels:{adrian:'low', ayushi:'moderate', prince:'high'}},
+        {domain:'Conscientiousness', label:'Cautiousness', levels:{adrian:'moderate', ayushi:'moderate', prince:'high'}},
+        {domain:'Agreeableness', label:'Trust', levels:{adrian:'moderate', ayushi:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Morality', levels:{adrian:'moderate', ayushi:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Altruism', levels:{adrian:'moderate', ayushi:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Cooperation', levels:{adrian:'low', ayushi:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Modesty', levels:{adrian:'moderate', ayushi:'high', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Sympathy', levels:{adrian:'moderate', ayushi:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Imagination', levels:{adrian:'high', ayushi:'low', prince:'low'}},
+        {domain:'Openness', label:'Artistic Interests', levels:{adrian:'moderate', ayushi:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Sentimentality', levels:{adrian:'moderate', ayushi:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Adventurousness', levels:{adrian:'low', ayushi:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Intellect', levels:{adrian:'moderate', ayushi:'moderate', prince:'low'}},
+        {domain:'Openness', label:'Liberalism', levels:{adrian:'high', ayushi:'moderate', prince:'high'}}
+      ] },
+    'ayushi,mark,prince': { icon:'puzzle', label:'Team Match', names:['Ayushi', 'Mark', 'Prince'],
+      trait:'14 of 30 facets land in the same Low/Moderate/High band across Ayushi, Mark and Prince. This team match is calculated directly from their ITP facet bands.',
+      facets:[
+        {domain:'Extraversion', label:'Friendliness', levels:{ayushi:'moderate', mark:'high', prince:'moderate'}},
+        {domain:'Extraversion', label:'Gregariousness', levels:{ayushi:'high', mark:'moderate', prince:'low'}},
+        {domain:'Extraversion', label:'Assertiveness', levels:{ayushi:'moderate', mark:'moderate', prince:'high'}},
+        {domain:'Extraversion', label:'Activity Level', levels:{ayushi:'moderate', mark:'high', prince:'moderate'}},
+        {domain:'Extraversion', label:'Excitement-Seeking', levels:{ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Extraversion', label:'Cheerfulness', levels:{ayushi:'moderate', mark:'high', prince:'moderate'}},
+        {domain:'Emotionality', label:'Anxiety', levels:{ayushi:'moderate', mark:'low', prince:'low'}},
+        {domain:'Emotionality', label:'Frustration', levels:{ayushi:'moderate', mark:'low', prince:'low'}},
+        {domain:'Emotionality', label:'Melancholy', levels:{ayushi:'moderate', mark:'low', prince:'low'}},
+        {domain:'Emotionality', label:'Self-Consciousness', levels:{ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Emotionality', label:'Immoderation', levels:{ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Emotionality', label:'Vulnerability', levels:{ayushi:'moderate', mark:'low', prince:'low'}},
+        {domain:'Conscientiousness', label:'Self-Efficacy', levels:{ayushi:'moderate', mark:'high', prince:'moderate'}},
+        {domain:'Conscientiousness', label:'Orderliness', levels:{ayushi:'high', mark:'high', prince:'high'}},
+        {domain:'Conscientiousness', label:'Dependability', levels:{ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Conscientiousness', label:'Achievement-Striving', levels:{ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Conscientiousness', label:'Self-Discipline', levels:{ayushi:'moderate', mark:'high', prince:'high'}},
+        {domain:'Conscientiousness', label:'Cautiousness', levels:{ayushi:'moderate', mark:'high', prince:'high'}},
+        {domain:'Agreeableness', label:'Trust', levels:{ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Morality', levels:{ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Altruism', levels:{ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Cooperation', levels:{ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Modesty', levels:{ayushi:'high', mark:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Sympathy', levels:{ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Imagination', levels:{ayushi:'low', mark:'moderate', prince:'low'}},
+        {domain:'Openness', label:'Artistic Interests', levels:{ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Sentimentality', levels:{ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Adventurousness', levels:{ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Intellect', levels:{ayushi:'moderate', mark:'low', prince:'low'}},
+        {domain:'Openness', label:'Liberalism', levels:{ayushi:'moderate', mark:'moderate', prince:'high'}}
+      ] },
+'adrian,ayushi,mark,prince': { icon:'puzzle', label:'Whole Team', names:['Adrian','Ayushi','Mark','Prince'],
+      trait:'10 of 30 traits land in the same band across all four teammates. The shared pattern is strongest in Emotionality, Agreeableness, and several Openness facets, while the team varies more in social energy, structure, and imagination.',
+      facets:[
+        {domain:'Extraversion', label:'Friendliness', levels:{adrian:'moderate', ayushi:'moderate', mark:'high', prince:'moderate'}},
+        {domain:'Extraversion', label:'Gregariousness', levels:{adrian:'low', ayushi:'high', mark:'moderate', prince:'low'}},
+        {domain:'Extraversion', label:'Assertiveness', levels:{adrian:'moderate', ayushi:'moderate', mark:'moderate', prince:'high'}},
+        {domain:'Extraversion', label:'Activity Level', levels:{adrian:'moderate', ayushi:'moderate', mark:'high', prince:'moderate'}},
+        {domain:'Extraversion', label:'Excitement-Seeking', levels:{adrian:'moderate', ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Extraversion', label:'Cheerfulness', levels:{adrian:'moderate', ayushi:'moderate', mark:'high', prince:'moderate'}},
+        {domain:'Emotionality', label:'Anxiety', levels:{adrian:'high', ayushi:'moderate', mark:'low', prince:'low'}},
+        {domain:'Emotionality', label:'Frustration', levels:{adrian:'moderate', ayushi:'moderate', mark:'low', prince:'low'}},
+        {domain:'Emotionality', label:'Melancholy', levels:{adrian:'high', ayushi:'moderate', mark:'low', prince:'low'}},
+        {domain:'Emotionality', label:'Self-Consciousness', levels:{adrian:'moderate', ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Emotionality', label:'Immoderation', levels:{adrian:'moderate', ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Emotionality', label:'Vulnerability', levels:{adrian:'moderate', ayushi:'moderate', mark:'low', prince:'low'}},
+        {domain:'Conscientiousness', label:'Self-Efficacy', levels:{adrian:'moderate', ayushi:'moderate', mark:'high', prince:'moderate'}},
+        {domain:'Conscientiousness', label:'Orderliness', levels:{adrian:'low', ayushi:'high', mark:'high', prince:'high'}},
+        {domain:'Conscientiousness', label:'Dependability', levels:{adrian:'low', ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Conscientiousness', label:'Achievement-Striving', levels:{adrian:'moderate', ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Conscientiousness', label:'Self-Discipline', levels:{adrian:'low', ayushi:'moderate', mark:'high', prince:'high'}},
+        {domain:'Conscientiousness', label:'Cautiousness', levels:{adrian:'moderate', ayushi:'moderate', mark:'high', prince:'high'}},
+        {domain:'Agreeableness', label:'Trust', levels:{adrian:'moderate', ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Morality', levels:{adrian:'moderate', ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Altruism', levels:{adrian:'moderate', ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Cooperation', levels:{adrian:'low', ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Modesty', levels:{adrian:'moderate', ayushi:'high', mark:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Sympathy', levels:{adrian:'moderate', ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Imagination', levels:{adrian:'high', ayushi:'low', mark:'moderate', prince:'low'}},
+        {domain:'Openness', label:'Artistic Interests', levels:{adrian:'moderate', ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Sentimentality', levels:{adrian:'moderate', ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Adventurousness', levels:{adrian:'low', ayushi:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Intellect', levels:{adrian:'moderate', ayushi:'moderate', mark:'low', prince:'low'}},
+        {domain:'Openness', label:'Liberalism', levels:{adrian:'high', ayushi:'moderate', mark:'moderate', prince:'high'}}
+      ] },
+    'ayushi,prince': { icon:'movie', label:'Movies', names:['Ayushi','Prince'],
+      trait:'19 of 30 traits land in the same band. Both align on many team-oriented and practical facets, while Ayushi is more group-oriented (Gregariousness: High vs Low) and Prince is more direct and structured on several facets (Assertiveness, Self-Discipline and Cautiousness: High vs Moderate).',
+      facets:[
+        {domain:'Extraversion', label:'Friendliness', levels:{ayushi:'moderate', prince:'moderate'}},
+        {domain:'Extraversion', label:'Gregariousness', levels:{ayushi:'high', prince:'low'}},
+        {domain:'Extraversion', label:'Assertiveness', levels:{ayushi:'moderate', prince:'high'}},
+        {domain:'Extraversion', label:'Activity Level', levels:{ayushi:'moderate', prince:'moderate'}},
+        {domain:'Extraversion', label:'Excitement-Seeking', levels:{ayushi:'moderate', prince:'moderate'}},
+        {domain:'Extraversion', label:'Cheerfulness', levels:{ayushi:'moderate', prince:'moderate'}},
+        {domain:'Emotionality', label:'Anxiety', levels:{ayushi:'moderate', prince:'low'}},
+        {domain:'Emotionality', label:'Frustration', levels:{ayushi:'moderate', prince:'low'}},
+        {domain:'Emotionality', label:'Melancholy', levels:{ayushi:'moderate', prince:'low'}},
+        {domain:'Emotionality', label:'Self-Consciousness', levels:{ayushi:'moderate', prince:'moderate'}},
+        {domain:'Emotionality', label:'Immoderation', levels:{ayushi:'moderate', prince:'moderate'}},
+        {domain:'Emotionality', label:'Vulnerability', levels:{ayushi:'moderate', prince:'low'}},
+        {domain:'Conscientiousness', label:'Self-Efficacy', levels:{ayushi:'moderate', prince:'moderate'}},
+        {domain:'Conscientiousness', label:'Orderliness', levels:{ayushi:'high', prince:'high'}},
+        {domain:'Conscientiousness', label:'Dependability', levels:{ayushi:'moderate', prince:'moderate'}},
+        {domain:'Conscientiousness', label:'Achievement-Striving', levels:{ayushi:'moderate', prince:'moderate'}},
+        {domain:'Conscientiousness', label:'Self-Discipline', levels:{ayushi:'moderate', prince:'high'}},
+        {domain:'Conscientiousness', label:'Cautiousness', levels:{ayushi:'moderate', prince:'high'}},
+        {domain:'Agreeableness', label:'Trust', levels:{ayushi:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Morality', levels:{ayushi:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Altruism', levels:{ayushi:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Cooperation', levels:{ayushi:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Modesty', levels:{ayushi:'high', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Sympathy', levels:{ayushi:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Imagination', levels:{ayushi:'low', prince:'low'}},
+        {domain:'Openness', label:'Artistic Interests', levels:{ayushi:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Sentimentality', levels:{ayushi:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Adventurousness', levels:{ayushi:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Intellect', levels:{ayushi:'moderate', prince:'low'}},
+        {domain:'Openness', label:'Liberalism', levels:{ayushi:'moderate', prince:'high'}}
+      ] },
+    'adrian,mark': { icon:'games', label:'Gaming', names:['Adrian','Mark'],
+      trait:'12 of 30 traits match — both stay humble, sympathetic, and steady on trust and morality. Past that, it’s a real contrast: Mark is the low-anxiety, highly disciplined, organized operator; Adrian runs higher on anxiety and imagination but lower on orderliness and self-discipline — structure meets creativity.',
+      facets:[
+        {domain:'Extraversion', label:'Friendliness', levels:{adrian:'moderate', mark:'high'}},
+        {domain:'Extraversion', label:'Gregariousness', levels:{adrian:'low', mark:'moderate'}},
+        {domain:'Extraversion', label:'Assertiveness', levels:{adrian:'moderate', mark:'moderate'}},
+        {domain:'Extraversion', label:'Activity Level', levels:{adrian:'moderate', mark:'high'}},
+        {domain:'Extraversion', label:'Excitement-Seeking', levels:{adrian:'moderate', mark:'moderate'}},
+        {domain:'Extraversion', label:'Cheerfulness', levels:{adrian:'moderate', mark:'high'}},
+        {domain:'Emotionality', label:'Anxiety', levels:{adrian:'high', mark:'low'}},
+        {domain:'Emotionality', label:'Frustration', levels:{adrian:'moderate', mark:'low'}},
+        {domain:'Emotionality', label:'Melancholy', levels:{adrian:'high', mark:'low'}},
+        {domain:'Emotionality', label:'Self-Consciousness', levels:{adrian:'moderate', mark:'moderate'}},
+        {domain:'Emotionality', label:'Immoderation', levels:{adrian:'moderate', mark:'moderate'}},
+        {domain:'Emotionality', label:'Vulnerability', levels:{adrian:'moderate', mark:'low'}},
+        {domain:'Conscientiousness', label:'Self-Efficacy', levels:{adrian:'moderate', mark:'high'}},
+        {domain:'Conscientiousness', label:'Orderliness', levels:{adrian:'low', mark:'high'}},
+        {domain:'Conscientiousness', label:'Dependability', levels:{adrian:'low', mark:'moderate'}},
+        {domain:'Conscientiousness', label:'Achievement-Striving', levels:{adrian:'moderate', mark:'moderate'}},
+        {domain:'Conscientiousness', label:'Self-Discipline', levels:{adrian:'low', mark:'high'}},
+        {domain:'Conscientiousness', label:'Cautiousness', levels:{adrian:'moderate', mark:'high'}},
+        {domain:'Agreeableness', label:'Trust', levels:{adrian:'moderate', mark:'moderate'}},
+        {domain:'Agreeableness', label:'Morality', levels:{adrian:'moderate', mark:'moderate'}},
+        {domain:'Agreeableness', label:'Altruism', levels:{adrian:'moderate', mark:'moderate'}},
+        {domain:'Agreeableness', label:'Cooperation', levels:{adrian:'low', mark:'moderate'}},
+        {domain:'Agreeableness', label:'Modesty', levels:{adrian:'moderate', mark:'moderate'}},
+        {domain:'Agreeableness', label:'Sympathy', levels:{adrian:'moderate', mark:'moderate'}},
+        {domain:'Openness', label:'Imagination', levels:{adrian:'high', mark:'moderate'}},
+        {domain:'Openness', label:'Artistic Interests', levels:{adrian:'moderate', mark:'moderate'}},
+        {domain:'Openness', label:'Sentimentality', levels:{adrian:'moderate', mark:'moderate'}},
+        {domain:'Openness', label:'Adventurousness', levels:{adrian:'low', mark:'moderate'}},
+        {domain:'Openness', label:'Intellect', levels:{adrian:'moderate', mark:'low'}},
+        {domain:'Openness', label:'Liberalism', levels:{adrian:'high', mark:'moderate'}}
+      ] },
+    'adrian,ayushi': { icon:'cooking', label:'Cooking & Music', names:['Adrian','Ayushi'],
+      trait:'19 of 30 traits land in the same band. Both share several steady, cooperative facets, while Adrian is more imaginative and less structured on some facets, and Ayushi is more organized and modest (Orderliness: High vs Low; Imagination: Low vs High; Modesty: High vs Moderate).',
+      facets:[
+        {domain:'Extraversion', label:'Friendliness', levels:{adrian:'moderate', ayushi:'moderate'}},
+        {domain:'Extraversion', label:'Gregariousness', levels:{adrian:'low', ayushi:'high'}},
+        {domain:'Extraversion', label:'Assertiveness', levels:{adrian:'moderate', ayushi:'moderate'}},
+        {domain:'Extraversion', label:'Activity Level', levels:{adrian:'moderate', ayushi:'moderate'}},
+        {domain:'Extraversion', label:'Excitement-Seeking', levels:{adrian:'moderate', ayushi:'moderate'}},
+        {domain:'Extraversion', label:'Cheerfulness', levels:{adrian:'moderate', ayushi:'moderate'}},
+        {domain:'Emotionality', label:'Anxiety', levels:{adrian:'high', ayushi:'moderate'}},
+        {domain:'Emotionality', label:'Frustration', levels:{adrian:'moderate', ayushi:'moderate'}},
+        {domain:'Emotionality', label:'Melancholy', levels:{adrian:'high', ayushi:'moderate'}},
+        {domain:'Emotionality', label:'Self-Consciousness', levels:{adrian:'moderate', ayushi:'moderate'}},
+        {domain:'Emotionality', label:'Immoderation', levels:{adrian:'moderate', ayushi:'moderate'}},
+        {domain:'Emotionality', label:'Vulnerability', levels:{adrian:'moderate', ayushi:'moderate'}},
+        {domain:'Conscientiousness', label:'Self-Efficacy', levels:{adrian:'moderate', ayushi:'moderate'}},
+        {domain:'Conscientiousness', label:'Orderliness', levels:{adrian:'low', ayushi:'high'}},
+        {domain:'Conscientiousness', label:'Dependability', levels:{adrian:'low', ayushi:'moderate'}},
+        {domain:'Conscientiousness', label:'Achievement-Striving', levels:{adrian:'moderate', ayushi:'moderate'}},
+        {domain:'Conscientiousness', label:'Self-Discipline', levels:{adrian:'low', ayushi:'moderate'}},
+        {domain:'Conscientiousness', label:'Cautiousness', levels:{adrian:'moderate', ayushi:'moderate'}},
+        {domain:'Agreeableness', label:'Trust', levels:{adrian:'moderate', ayushi:'moderate'}},
+        {domain:'Agreeableness', label:'Morality', levels:{adrian:'moderate', ayushi:'moderate'}},
+        {domain:'Agreeableness', label:'Altruism', levels:{adrian:'moderate', ayushi:'moderate'}},
+        {domain:'Agreeableness', label:'Cooperation', levels:{adrian:'low', ayushi:'moderate'}},
+        {domain:'Agreeableness', label:'Modesty', levels:{adrian:'moderate', ayushi:'high'}},
+        {domain:'Agreeableness', label:'Sympathy', levels:{adrian:'moderate', ayushi:'moderate'}},
+        {domain:'Openness', label:'Imagination', levels:{adrian:'high', ayushi:'low'}},
+        {domain:'Openness', label:'Artistic Interests', levels:{adrian:'moderate', ayushi:'moderate'}},
+        {domain:'Openness', label:'Sentimentality', levels:{adrian:'moderate', ayushi:'moderate'}},
+        {domain:'Openness', label:'Adventurousness', levels:{adrian:'low', ayushi:'moderate'}},
+        {domain:'Openness', label:'Intellect', levels:{adrian:'moderate', ayushi:'moderate'}},
+        {domain:'Openness', label:'Liberalism', levels:{adrian:'high', ayushi:'moderate'}}
+      ] },
+    'adrian,prince': { icon:'handshake', label:'Personality Match', names:['Adrian','Prince'],
+      trait:'No shared hobby — but 17 of 30 traits still line up. Both keep to themselves in a group (Gregariousness: Low), stay warm and modest across Agreeableness, and lean liberal (Liberalism: High both). The real gap: Prince is the more disciplined, orderly, assertive one; Adrian runs higher on anxiety and imagination.',
+      facets:[
+        {domain:'Extraversion', label:'Friendliness', levels:{adrian:'moderate', prince:'moderate'}},
+        {domain:'Extraversion', label:'Gregariousness', levels:{adrian:'low', prince:'low'}},
+        {domain:'Extraversion', label:'Assertiveness', levels:{adrian:'moderate', prince:'high'}},
+        {domain:'Extraversion', label:'Activity Level', levels:{adrian:'moderate', prince:'moderate'}},
+        {domain:'Extraversion', label:'Excitement-Seeking', levels:{adrian:'moderate', prince:'moderate'}},
+        {domain:'Extraversion', label:'Cheerfulness', levels:{adrian:'moderate', prince:'moderate'}},
+        {domain:'Emotionality', label:'Anxiety', levels:{adrian:'high', prince:'low'}},
+        {domain:'Emotionality', label:'Frustration', levels:{adrian:'moderate', prince:'low'}},
+        {domain:'Emotionality', label:'Melancholy', levels:{adrian:'high', prince:'low'}},
+        {domain:'Emotionality', label:'Self-Consciousness', levels:{adrian:'moderate', prince:'moderate'}},
+        {domain:'Emotionality', label:'Immoderation', levels:{adrian:'moderate', prince:'moderate'}},
+        {domain:'Emotionality', label:'Vulnerability', levels:{adrian:'moderate', prince:'low'}},
+        {domain:'Conscientiousness', label:'Self-Efficacy', levels:{adrian:'moderate', prince:'moderate'}},
+        {domain:'Conscientiousness', label:'Orderliness', levels:{adrian:'low', prince:'high'}},
+        {domain:'Conscientiousness', label:'Dependability', levels:{adrian:'low', prince:'moderate'}},
+        {domain:'Conscientiousness', label:'Achievement-Striving', levels:{adrian:'moderate', prince:'moderate'}},
+        {domain:'Conscientiousness', label:'Self-Discipline', levels:{adrian:'low', prince:'high'}},
+        {domain:'Conscientiousness', label:'Cautiousness', levels:{adrian:'moderate', prince:'high'}},
+        {domain:'Agreeableness', label:'Trust', levels:{adrian:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Morality', levels:{adrian:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Altruism', levels:{adrian:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Cooperation', levels:{adrian:'low', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Modesty', levels:{adrian:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Sympathy', levels:{adrian:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Imagination', levels:{adrian:'high', prince:'low'}},
+        {domain:'Openness', label:'Artistic Interests', levels:{adrian:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Sentimentality', levels:{adrian:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Adventurousness', levels:{adrian:'low', prince:'moderate'}},
+        {domain:'Openness', label:'Intellect', levels:{adrian:'moderate', prince:'low'}},
+        {domain:'Openness', label:'Liberalism', levels:{adrian:'high', prince:'high'}}
+      ] },
+    'adrian,mark,prince': { icon:'puzzle', label:'Team Core', names:['Adrian','Mark','Prince'],
+      trait:'11 of 30 traits are shared by all three — almost entirely in Agreeableness (Trust, Morality, Altruism, Modesty, Sympathy: Moderate, across the board) plus staying composed under pressure (Self-Consciousness, Immoderation, Achievement-Striving, Excitement-Seeking). Past that they split fast: Mark brings the energy, Prince the discipline and drive, Adrian the imagination — and the anxiety that comes with it.',
+      facets:[
+        {domain:'Extraversion', label:'Friendliness', levels:{adrian:'moderate', mark:'high', prince:'moderate'}},
+        {domain:'Extraversion', label:'Gregariousness', levels:{adrian:'low', mark:'moderate', prince:'low'}},
+        {domain:'Extraversion', label:'Assertiveness', levels:{adrian:'moderate', mark:'moderate', prince:'high'}},
+        {domain:'Extraversion', label:'Activity Level', levels:{adrian:'moderate', mark:'high', prince:'moderate'}},
+        {domain:'Extraversion', label:'Excitement-Seeking', levels:{adrian:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Extraversion', label:'Cheerfulness', levels:{adrian:'moderate', mark:'high', prince:'moderate'}},
+        {domain:'Emotionality', label:'Anxiety', levels:{adrian:'high', mark:'low', prince:'low'}},
+        {domain:'Emotionality', label:'Frustration', levels:{adrian:'moderate', mark:'low', prince:'low'}},
+        {domain:'Emotionality', label:'Melancholy', levels:{adrian:'high', mark:'low', prince:'low'}},
+        {domain:'Emotionality', label:'Self-Consciousness', levels:{adrian:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Emotionality', label:'Immoderation', levels:{adrian:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Emotionality', label:'Vulnerability', levels:{adrian:'moderate', mark:'low', prince:'low'}},
+        {domain:'Conscientiousness', label:'Self-Efficacy', levels:{adrian:'moderate', mark:'high', prince:'moderate'}},
+        {domain:'Conscientiousness', label:'Orderliness', levels:{adrian:'low', mark:'high', prince:'high'}},
+        {domain:'Conscientiousness', label:'Dependability', levels:{adrian:'low', mark:'moderate', prince:'moderate'}},
+        {domain:'Conscientiousness', label:'Achievement-Striving', levels:{adrian:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Conscientiousness', label:'Self-Discipline', levels:{adrian:'low', mark:'high', prince:'high'}},
+        {domain:'Conscientiousness', label:'Cautiousness', levels:{adrian:'moderate', mark:'high', prince:'high'}},
+        {domain:'Agreeableness', label:'Trust', levels:{adrian:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Morality', levels:{adrian:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Altruism', levels:{adrian:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Cooperation', levels:{adrian:'low', mark:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Modesty', levels:{adrian:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Agreeableness', label:'Sympathy', levels:{adrian:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Imagination', levels:{adrian:'high', mark:'moderate', prince:'low'}},
+        {domain:'Openness', label:'Artistic Interests', levels:{adrian:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Sentimentality', levels:{adrian:'moderate', mark:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Adventurousness', levels:{adrian:'low', mark:'moderate', prince:'moderate'}},
+        {domain:'Openness', label:'Intellect', levels:{adrian:'moderate', mark:'low', prince:'low'}},
+        {domain:'Openness', label:'Liberalism', levels:{adrian:'high', mark:'moderate', prince:'high'}}
+      ] }
+  };
+  var LEVEL_POS = { low:16.6, mid:50, high:83.4 };
+
+  function comboKey(ids){ return ids.slice().sort().join(','); }
+  function joinNames(names, sep){
+    sep = sep || ' & ';
+    if (names.length <= 2) return names.join(sep);
+    return names.slice(0,-1).join(', ') + sep + names[names.length-1];
+  }
+
+  var REDUCED_MOTION = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function tierDiameter(n, viewportW){
+    var base = viewportW < 520 ? [70,96,118,138] : viewportW < 980 ? [86,120,148,172] : [98,138,172,206];
+    return base[Math.min(n,4)-1];
+  }
+
+  var stage = document.getElementById('stage');
+  var tooltip = document.getElementById('tooltip');
+  var ttName = tooltip.querySelector('.tt-name');
+  var ttSub = tooltip.querySelector('.tt-sub');
+  var connectsEl = document.getElementById('connects');
+
+  var bubbles = [];
+  var uid = 0;
+  var lastMerged = null;
+
+  var MOVEMENT = {
+    prince: {
+      minSpeed:0.10,
+      maxSpeed:0.16,
+      wanderChance:0.035,
+      wanderStrength:0.75
+    },
+    mark: {
+      minSpeed:0.40,
+      maxSpeed:0.55,
+      wanderChance:0.035,
+      wanderStrength:0.70
+    },
+    ayushi: {
+      minSpeed:0.22,
+      maxSpeed:0.30,
+      wanderChance:0.014,
+      wanderStrength:0.35
+    },
+    adrian: {
+      minSpeed:0.28,
+      maxSpeed:0.37,
+      wanderChance:0.012,
+      wanderStrength:0.30
+    }
+  };
+  function rand(min, max){ return min + Math.random() * (max - min); }
+  function stageRect(){ return { w: stage.clientWidth, h: stage.clientHeight }; }
+  function clamp(v, lo, hi){ return Math.max(lo, Math.min(hi, v)); }
+
+  function makeBubble(memberIds, x, y, vx, vy, opts){
+    opts = opts || {};
+    var r = tierDiameter(memberIds.length, stageRect().w) / 2;
+    var b = {
+      id:'b'+(uid++), memberIds:memberIds.slice(),
+      kind: memberIds.length > 1 ? 'merged' : 'solo',
+      x:x, y:y, vx:vx, vy:vy, r:r,
+      interestIndex:-1,
+      dragging:false, frozen:false,
+      el:null, inner:null, dotsEl:null, tagEl:null
+    };
+    buildDom(b);
+    bubbles.push(b);
+    attachHandlers(b);
+    if (opts.pop) spawnPop(b);
+    return b;
+  }
+
+  function buildDom(b){
+    var el = document.createElement('div');
+    el.className = 'bubble';
+    el.style.width = el.style.height = (b.r*2) + 'px';
+    el.setAttribute('tabindex','0');
+    el.setAttribute('role','button');
+
+    var inner = document.createElement('div');
+    inner.className = 'bubble-inner';
+    el.appendChild(inner);
+
+    var dots = document.createElement('div');
+    dots.className = 'dots';
+    var tag = document.createElement('div');
+    tag.className = 'name-tag';
+    stage.appendChild(dots);
+    stage.appendChild(tag);
+    stage.appendChild(el);
+
+    b.el = el; b.inner = inner; b.dotsEl = dots; b.tagEl = tag;
+    refreshVisual(b);
+  }
+
+  function bubbleContent(b){
+    if (b.kind === 'solo'){
+      var m = MEMBERS[b.memberIds[0]];
+      if (b.interestIndex < 0) return { icon:m.identityIcon, name:m.name, sub:null, color:m.color, count:m.interests.length };
+      var it = m.interests[b.interestIndex];
+      return { icon:it.icon, name:m.name, sub:it.label, color:m.color, count:m.interests.length };
+    }
+    var combo = COMBOS[comboKey(b.memberIds)];
+    var names = b.memberIds.map(function(id){ return MEMBERS[id].name; });
+    return { icon:combo.icon, name:joinNames(names, ' + '), sub:combo.label, trait:combo.trait, color:'var(--accent)', count:0 };
+  }
+
+  function refreshVisual(b){
+    var c = bubbleContent(b);
+    b.inner.style.setProperty('--accent-c', c.color);
+    b.inner.innerHTML = iconMarkup(c.icon, Math.round(b.r*0.85));
+    var label = c.sub ? (c.name+' — '+c.sub) : (c.name+', drag to combine or click to explore');
+    b.el.setAttribute('aria-label', label);
+
+    if (b.kind === 'solo' && c.count > 1){
+      var html = '';
+      for (var i=0;i<c.count;i++){ html += '<span'+(i===b.interestIndex?' class="active"':'')+'></span>'; }
+      b.dotsEl.innerHTML = html; b.dotsEl.style.display='flex'; b.tagEl.style.display='none';
+    } else if (b.kind === 'solo'){
+      b.dotsEl.style.display='none'; b.tagEl.style.display='none';
+    } else {
+      b.dotsEl.style.display='none'; b.tagEl.style.display='block'; b.tagEl.textContent = c.name;
+    }
+  }
+
+  function position(b){
+    b.el.style.transform = 'translate3d('+(b.x-b.r)+'px,'+(b.y-b.r)+'px,0)';
+    b.dotsEl.style.transform = 'translate(-50%,0) translate3d('+b.x+'px,'+(b.y+b.r+10)+'px,0)';
+    b.tagEl.style.transform = 'translate(-50%,0) translate3d('+b.x+'px,'+(b.y+b.r+10)+'px,0)';
+  }
+
+  function spawnPop(b){
+    b.inner.classList.add('spawn-in');
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ b.inner.classList.remove('spawn-in'); }); });
+  }
+  function rejectPulse(b){ b.inner.classList.add('reject'); setTimeout(function(){ b.inner.classList.remove('reject'); },340); }
+
+  function removeBubble(b){
+    var idx = bubbles.indexOf(b);
+    if (idx > -1) bubbles.splice(idx,1);
+    [b.el,b.dotsEl,b.tagEl].forEach(function(node){ if (node && node.parentNode) node.parentNode.removeChild(node); });
+    if (lastMerged === b) lastMerged = null;
+  }
+  
+  function randomVel(memberId) {
+
+    var movement = MOVEMENT[memberId];
+    if (!movement) {
+      movement = {
+        minSpeed: 0.12,
+        maxSpeed: 0.24
+      };
+    }
+
+    var speed = rand(
+      movement.minSpeed,
+      movement.maxSpeed
+    );
+
+    var angle = rand(0, Math.PI * 2);
+
+    return {
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed
+    };
+}
+
+  function showTooltip(b){
+    var c = bubbleContent(b);
+    ttName.textContent = c.name;
+    ttSub.innerHTML = c.sub ? (c.trait ? (c.sub+'<br>'+c.trait) : c.sub) : 'Tap to explore their interests';
+    tooltip.classList.add('show'); positionTooltip(b);
+  }
+  function positionTooltip(b){
+    var rect = stage.getBoundingClientRect();
+    var x = rect.left + b.x, y = rect.top + b.y - b.r - 14;
+    tooltip.style.left = clamp(x, rect.left+70, rect.right-70) + 'px';
+    tooltip.style.top = Math.max(rect.top+30, y) + 'px';
+  }
+  function hideTooltip(){ tooltip.classList.remove('show'); }
+
+  function mergeCandidate(dragged){
+    var best=null, bestDist=Infinity;
+    bubbles.forEach(function(other){
+      if (other===dragged || other.dragging) return;
+      var dx=other.x-dragged.x, dy=other.y-dragged.y, dist=Math.sqrt(dx*dx+dy*dy);
+      var ids = dragged.memberIds.concat(other.memberIds);
+      if (ids.length > 4 || !COMBOS[comboKey(ids)]) return;
+      if (dist < (dragged.r+other.r)*0.95 && dist < bestDist){ best=other; bestDist=dist; }
+    });
+    return best;
+  }
+  function nearestOverlap(dragged){
+    var best=null, bestDist=Infinity;
+    bubbles.forEach(function(other){
+      if (other===dragged || other.dragging) return;
+      var dx=other.x-dragged.x, dy=other.y-dragged.y, dist=Math.sqrt(dx*dx+dy*dy);
+      if (dist < (dragged.r+other.r)*0.62 && dist < bestDist){ best=other; bestDist=dist; }
+    });
+    return best;
+  }
+  function clearTargetGlow(){ bubbles.forEach(function(b){ b.inner.classList.remove('target-glow'); }); }
+
+  function doMerge(dragged, target){
+    playBubbleSound('merge');
+    var ids = dragged.memberIds.concat(target.memberIds);
+    var mx=(dragged.x+target.x)/2, my=(dragged.y+target.y)/2;
+    removeBubble(dragged); removeBubble(target);
+    var nb = makeBubble(ids, mx, my, 0, 0, { pop:true });
+    lastMerged = nb;
+    renderConnects();
+  }
+  function unmerge(b){
+    playBubbleSound('unmerge');
+    var cx=b.x, cy=b.y, n=b.memberIds.length;
+    removeBubble(b);
+    b.memberIds.forEach(function(id,i){
+      var angle=(i/n)*Math.PI*2+rand(-.25,.25), spread=64, v=randomVel(id);
+      makeBubble([id], cx+Math.cos(angle)*spread, cy+Math.sin(angle)*spread, v.vx, v.vy, { pop:true });
+    });
+    if (!lastMerged){
+      var other = bubbles.filter(function(x){ return x.kind==='merged'; })[0];
+      lastMerged = other || null;
+    }
+    renderConnects();
+  }
+
+  function cycleOrSplit(b){
+    if (b.kind === 'solo'){
+      playBubbleSound('click');
+      var m = MEMBERS[b.memberIds[0]];
+      b.inner.classList.add('compress');
+      setTimeout(function(){
+        b.interestIndex = (b.interestIndex+1) % m.interests.length;
+        refreshVisual(b);
+        b.inner.classList.remove('compress');
+        if (tooltip.classList.contains('show')) showTooltip(b);
+      }, 170);
+    } else { hideTooltip(); unmerge(b); }
+  }
+
+  function attachHandlers(b){
+    var startX,startY,startTime,offX,offY;
+    b.el.addEventListener('pointerenter', function(){
+      if (!bubbles.some(function(x){return x.dragging;})){ b.frozen=true; b.inner.classList.add('hovered'); showTooltip(b); }
+    });
+    b.el.addEventListener('pointermove', function(){ if (tooltip.classList.contains('show') && !b.dragging) positionTooltip(b); });
+    b.el.addEventListener('pointerleave', function(){ if (!b.dragging){ b.frozen=false; b.inner.classList.remove('hovered'); hideTooltip(); } });
+    b.el.addEventListener('keydown', function(e){ if (e.key==='Enter'||e.key===' '){ e.preventDefault(); cycleOrSplit(b); } });
+
+    b.el.addEventListener('pointerdown', function(e){
+      if (e.button!==undefined && e.button!==0) return;
+      e.preventDefault();
+      startX=e.clientX; startY=e.clientY; startTime=Date.now();
+      offX=b.x-e.clientX; offY=b.y-e.clientY;
+      b.el.setPointerCapture(e.pointerId);
+
+      function onMove(ev){
+        var dx=ev.clientX-startX, dy=ev.clientY-startY;
+        if (!b.dragging && Math.sqrt(dx*dx+dy*dy)>5){
+          b.dragging=true; b.frozen=true; b.el.classList.add('dragging'); b.inner.classList.remove('hovered'); hideTooltip();
+        }
+        if (b.dragging){
+          var s=stageRect();
+          b.x=clamp(ev.clientX+offX, b.r, s.w-b.r);
+          b.y=clamp(ev.clientY+offY, b.r, s.h-b.r);
+          position(b);
+          clearTargetGlow();
+          var cand=mergeCandidate(b);
+          if (cand) cand.inner.classList.add('target-glow');
+        }
+      }
+      function onUp(ev){
+        b.el.releasePointerCapture(e.pointerId);
+        b.el.removeEventListener('pointermove', onMove);
+        b.el.removeEventListener('pointerup', onUp);
+        clearTargetGlow();
+        var dx=ev.clientX-startX, dy=ev.clientY-startY, dist=Math.sqrt(dx*dx+dy*dy);
+        var elapsed=Date.now()-startTime, wasDragging=b.dragging;
+        b.dragging=false; b.el.classList.remove('dragging');
+
+        if (!wasDragging && dist<6 && elapsed<450){
+          cycleOrSplit(b);
+        } else if (wasDragging){
+          var target=mergeCandidate(b);
+          if (target){ doMerge(b,target); return; }
+          var overlap=nearestOverlap(b);
+          if (overlap) rejectPulse(b);
+	  var memberId = b.kind === 'solo'? b.memberIds[0]: null;
+
+          var v=randomVel(memberId); b.vx=v.vx; b.vy=v.vy;
+        }
+        b.frozen=false;
+      }
+      b.el.addEventListener('pointermove', onMove);
+      b.el.addEventListener('pointerup', onUp);
+    });
+  }
+
+  function tick(){
+  if (!REDUCED_MOTION){
+    var s=stageRect();
+
+    bubbles.forEach(function(b){
+      if (b.dragging||b.frozen) return;
+
+      var movement;
+      if (b.kind === 'solo'){
+        movement = MOVEMENT[b.memberIds[0]];
+      }
+
+      if (!movement){
+        movement = {
+          minSpeed:.12,
+          maxSpeed:.24,
+          wanderChance:.012,
+          wanderStrength:.020
+        };
+      }
+
+      if (Math.random() < movement.wanderChance){
+        var sp=Math.sqrt(b.vx*b.vx+b.vy*b.vy);
+        var currentAngle=Math.atan2(b.vy,b.vx);
+        var newAngle=currentAngle+rand(-movement.wanderStrength,movement.wanderStrength);
+
+        b.vx=Math.cos(newAngle)*sp;
+        b.vy=Math.sin(newAngle)*sp;
+      }
+
+      var sp=Math.sqrt(b.vx*b.vx+b.vy*b.vy);
+
+      if (sp > movement.maxSpeed){
+        b.vx=b.vx/sp*movement.maxSpeed;
+        b.vy=b.vy/sp*movement.maxSpeed;
+      }
+
+      if (sp < movement.minSpeed && sp > 0){
+        b.vx=b.vx/sp*movement.minSpeed;
+        b.vy=b.vy/sp*movement.minSpeed;
+      }
+
+      b.x+=b.vx;
+      b.y+=b.vy;
+
+      if (b.x-b.r<0){ b.x=b.r; b.vx=Math.abs(b.vx); }
+      if (b.x+b.r>s.w){ b.x=s.w-b.r; b.vx=-Math.abs(b.vx); }
+      if (b.y-b.r<20){ b.y=20+b.r; b.vy=Math.abs(b.vy); }
+      if (b.y+b.r>s.h-20){ b.y=s.h-20-b.r; b.vy=-Math.abs(b.vy); }
+    });
+
+    for (var i=0;i<bubbles.length;i++){
+      for (var j=i+1;j<bubbles.length;j++){
+        var a=bubbles[i], c=bubbles[j];
+
+        if (a.dragging||c.dragging) continue;
+
+        var ddx=c.x-a.x, ddy=c.y-a.y, dist=Math.sqrt(ddx*ddx+ddy*ddy)||.001;
+        var minDist=(a.r+c.r)*.86;
+
+        if (dist<minDist){
+          var push=(minDist-dist)/2, nx=ddx/dist, ny=ddy/dist;
+
+          if (!a.frozen){ a.x-=nx*push; a.y-=ny*push; }
+          if (!c.frozen){ c.x+=nx*push; c.y+=ny*push; }
+        }
+      }
+    }
+  }
+
+  bubbles.forEach(position);
+  requestAnimationFrame(tick);
+}
+
+  // ---------------------------------------------------------------
+  // ON-PAGE REVEAL — deep trait comparison, lives under the canvas
+  // ---------------------------------------------------------------
+  function getComputedColor(varExpr){
+    var m = varExpr.match(/var\((--[a-z]+)\)/);
+    if (!m) return varExpr;
+    return getComputedStyle(document.documentElement).getPropertyValue(m[1]).trim();
+  }
+
+  function renderConnects(){
+    if (!lastMerged){
+      connectsEl.innerHTML =
+        '<div class="empty-state" style="padding:6px 6px 4px;">'+
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="12" r="4.2"/><circle cx="16" cy="12" r="4.2"/></svg>'+
+        '<p>Drag two bubbles together above &mdash; this card will show exactly what connects them.</p></div>';
+      return;
+    }
+    var b = lastMerged;
+    var combo = COMBOS[comboKey(b.memberIds)];
+    var names = b.memberIds.map(function(id){ return MEMBERS[id].name; });
+    var html = '<div class="reveal-head"><div class="reveal-icon">'+iconMarkup(combo.icon, 22)+'</div><div><h3>'+joinNames(names)+'</h3><p>'+combo.label+'</p></div></div>';
+
+    if (combo.facets && combo.facets.length){
+      var ids = b.memberIds;
+      var total = combo.facets.length;
+      var matchCount = combo.facets.filter(function(f){
+        var vals = ids.map(function(id){ return f.levels[id]; });
+        return vals.every(function(v){ return v===vals[0]; });
+      }).length;
+      var pct = Math.round(matchCount/total*100);
+
+      html += '<div class="match-stat"><div class="stat-num">'+pct+'%</div><div class="stat-copy"><p class="stat-label">Personality Match</p><p class="stat-sub">'+matchCount+' of '+total+' Big Five traits align</p></div></div>';
+
+      html += '<div class="reveal-legend">'+ids.map(function(id){
+        var m = MEMBERS[id];
+        return '<span class="chip"><i style="background:'+getComputedColor(m.color)+'"></i>'+m.name+'</span>';
+      }).join('')+'</div>';
+      html += '<div class="facet-scale"><span>Low</span><span>Moderate</span><span>High</span></div>';
+      var lastDomain = null;
+      combo.facets.forEach(function(f){
+        if (f.domain !== lastDomain){
+          html += '<div class="domain-heading">'+f.domain+'</div>';
+          lastDomain = f.domain;
+        }
+        var vals = ids.map(function(id){ return f.levels[id]; });
+        var allSame = vals.every(function(v){ return v===vals[0]; });
+        html += '<div class="facet-row compact"><div class="flabel">'+f.label+(allSame?' <span class="match">Shared</span>':'')+'</div><div class="ftrack">';
+        ids.forEach(function(id){
+          var lvl = f.levels[id];
+          var pos = LEVEL_POS[lvl] || 50;
+          var jitter = ids.length>1 ? (ids.indexOf(id) - (ids.length-1)/2) * 6 : 0;
+          html += '<div class="fmark" style="left:'+pos+'%; background:'+getComputedColor(MEMBERS[id].color)+'; margin-top:'+jitter+'px;"></div>';
+        });
+        html += '</div></div>';
+      });
+      if (combo.trait) html += '<p style="font-size:13px;color:var(--ink-dim);font-weight:600;line-height:1.55;margin-top:14px;">'+combo.trait+'</p>';
+    } else {
+      html += '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.1"/></svg><p>Personality comparison isn’t unlocked yet &mdash; it needs both teammates’ full ITP report. Their shared interest above is confirmed; the deeper trait match is pending more data.</p></div>';
+    }
+    connectsEl.innerHTML = html;
+  }
+
+  // ---------------------------------------------------------------
+  // TEAM STRIP
+  // ---------------------------------------------------------------
+  function renderTeamStrip(){
+    var grid = document.getElementById('team-grid');
+    grid.innerHTML = Object.keys(MEMBERS).map(function(id){
+      var m = MEMBERS[id];
+      var labels = m.interests.map(function(i){ return i.label; }).join(', ');
+      return '<div class="team-card"><div class="team-swatch" style="background:'+m.color+'">'+iconMarkup(m.identityIcon, 18)+'</div><div><h4>'+m.name+'</h4><p>'+labels+'</p></div></div>';
+    }).join('');
+  }
+
+  // ---------------------------------------------------------------
+  // BOOT / RESET
+  // ---------------------------------------------------------------
+  function layout(){
+    var s = stageRect();
+    var order = ['prince','mark','ayushi','adrian'];
+    order.forEach(function(id, i){
+      var cx = s.w * (0.24 + (i % 2) * 0.52);
+      var cy = s.h * (0.36 + Math.floor(i/2) * 0.32) + rand(-16,16);
+      var v = randomVel(id);
+      makeBubble([id], cx, cy, v.vx, v.vy);
+    });
+    lastMerged = null;
+    renderConnects();
+  }
+  function resetAll(){ bubbles.slice().forEach(removeBubble); layout(); }
+
+  document.getElementById('reset-header').addEventListener('click', resetAll);
+  document.getElementById('reset-hero').addEventListener('click', function(){
+    document.getElementById('team').scrollIntoView({ behavior: REDUCED_MOTION ? 'auto' : 'smooth', block:'start' });
+  });
+
+  window.addEventListener('resize', function(){
+    var s = stageRect();
+    bubbles.forEach(function(b){ b.x=clamp(b.x,b.r,s.w-b.r); b.y=clamp(b.y,b.r+20,s.h-b.r-20); });
+  });
+
+  function boot(){
+    renderTeamStrip();
+    layout();
+    requestAnimationFrame(tick);
+  }
+  if (document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', boot); } else { boot(); }
+})();
+</script>
+
+</body></html>
